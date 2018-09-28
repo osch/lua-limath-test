@@ -1,0 +1,54 @@
+language: c
+
+sudo: false
+
+matrix:
+  include:
+    - env: LUA="lua 5.1" LUAROCKS="2.4.4"
+      os: linux
+    - env: LUA="lua 5.2" LUAROCKS="2.4.4"
+      os: linux
+    - env: LUA="lua 5.3" LUAROCKS="2.4.4"
+      os: linux
+    - env: LUA="lua 5.3" LUAROCKS="3.0.2"
+      os: linux
+    - env: LUA="luajit 2.0" LUAROCKS="2.4.4"
+      os: linux
+    - env: LUA="luajit 2.1" LUAROCKS="2.4.4"
+      os: linux
+    - env: LUA="lua 5.1" LUAROCKS="2.4.4"
+      os: osx
+    - env: LUA="lua 5.3" LUAROCKS="2.4.4"
+      os: osx
+    - env: LUA="lua 5.3" LUAROCKS="3.0.2"
+      os: osx
+    - env: LUA="luajit 2.0" LUAROCKS="2.4.4"
+      os: osx
+    - env: LUA="luajit 2.1" LUAROCKS="2.4.4"
+      os: osx
+
+cache:
+  directories:
+    - here
+    - $HOME/.cache/pip
+
+branches:
+  only:
+    - master
+
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export PATH=$PATH:~/Library/Python/2.7/bin/; fi
+  - pip2 install --user hererocks
+  - hererocks here --luarocks $LUAROCKS --$LUA
+  - source here/bin/activate
+
+install:
+  - luarocks install limath-100-1.rockspec
+
+script: 
+  - lua test.lua
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always
